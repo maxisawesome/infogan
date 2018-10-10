@@ -53,3 +53,12 @@ class Trainer():
                 self.train_gan()
                 if print_every and batch % print_every == 0:
                     print("GAN loss {} \t D loss {} \t Entropy {}".format(self.g_loss_history[-1], self.d_loss_history[-1], self.ent_loss_history[-1]))
+    def fit_data_generator(self, data_gen, num_epochs=1, print_every=0):
+        for epoch in range(num_epochs):
+            print("\nEpoch {}".format(epoch +1))
+            for batch in data_gen:
+                self.train_discriminator()
+                self.train_discriminator(batch)
+                self.train_gan()
+                if print_every and batch % print_every == 0:
+                    print("GAN loss {} \t D loss {} \t Entropy {}".format(self.g_loss_history[-1], self.d_loss_history[-1], self.ent_loss_history[-1]))

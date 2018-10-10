@@ -1,10 +1,33 @@
+import glob
+import numpy as np
+import random
+from PIL import Image
 from util import get_processed_mnist
 from infogan import InfoGAN
 from trainer import Trainer
 
-(x_train, y_train), (x_test, y_test) = get_processed_mnist()
-model = InfoGAN()
+def data_generator(batch_size, img_dir, img_size):
+    w = img_size
+    h = img_size
+    image_filenames = glob.glob(img_dir + "/**/*.jpg")
+    #import pdb;pdb.set_trace()
+    counter = 0 
+    while True:
+        img_data = np.zeros((batch_size, w, h, 3))
+        random.shuffle(image_filenames)
+        if ((counter+1)*batch_size>=len(image_filenames)):
+            counter = 0
+        for i in range(batch_size):
+            img = Image.open(image_filenames[counter + i]).resize((w, h))
+            img_data[i] = np.array(img)
+        yield img_data
+
+image_size=512
+batch_size = 64
+data_generator = data_generator(batch_size, 'downloaded', image_size)
+model = InfoGAN(input_shape=(image_size, image_size, 3), batch_size=batch_size)
 model.gan.summary()
 model.discriminator.summary()
+
 trainer = Trainer(model)
-trainer.fit(x_train, print_every=10)
+trainer.fit_data_generator(data_generator, print_every=10)
