@@ -1,4 +1,5 @@
 import numpy as np
+import time
 from util import get_batch
 
 class Trainer():
@@ -54,11 +55,18 @@ class Trainer():
                 if print_every and batch % print_every == 0:
                     print("GAN loss {} \t D loss {} \t Entropy {}".format(self.g_loss_history[-1], self.d_loss_history[-1], self.ent_loss_history[-1]))
     def fit_data_generator(self, data_gen, num_epochs=1, print_every=0):
+        start_all = time.time()
         for epoch in range(num_epochs):
+            start_epoch = time.time()
             print("\nEpoch {}".format(epoch +1))
-            for batch in data_gen:
+            for batch_num, batch in enumerate(data_gen):
+                batch_start = time.time()
+                total_item = 109388 #I just looked this up this is bad programming tsk tsk
+                batches_left = (total_item/self.model.batch_size)-batch_num
                 self.train_discriminator()
                 self.train_discriminator(batch)
                 self.train_gan()
-                if print_every and batch % print_every == 0:
+                if print_every and batch_num % print_every == 0:
                     print("GAN loss {} \t D loss {} \t Entropy {}".format(self.g_loss_history[-1], self.d_loss_history[-1], self.ent_loss_history[-1]))
+                    print("Time elapsed this epoch: {} min \t Approx time until finished with epoch: ~{} min".format((time.time()-start_epoch)/60, batches_left*(time.time()-batch_start)/60))
+            model.generate_and_save(epoch, 10)

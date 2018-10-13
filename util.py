@@ -18,17 +18,6 @@ def disc_mutual_info_loss(c_disc, aux_dist):
     ent = - K.mean( K.sum( K.log(1./reg_disc_dim + EPSILON) * c_disc, axis=1 ) )
     return ent - cross_ent
 
-def get_processed_mnist():
-    """
-    Get normalized MNIST datasets with correct shapes (Tensorflow style).
-    """
-    (x_train, y_train), (x_test, y_test) = mnist.load_data()
-    x_train = x_train.astype('float32') / 255.
-    x_train = x_train.reshape(x_train.shape + (1,))
-    x_test = x_test.astype('float32') / 255.
-    x_test = x_test.reshape(x_test.shape + (1,))
-    return (x_train, y_train), (x_test, y_test)
-
 def plot_digit_grid(model, fig_size=10, digit_size=28, std_dev=2.,
                     filename='infogan'):
     """

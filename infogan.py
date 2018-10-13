@@ -80,10 +80,10 @@ class InfoGAN():
         x = Concatenate()([self.z_input, self.c_disc_input])
         x = Dense(1024, activation='relu')(x)
         x = BatchNormalization()(x)
-        x = Dense(16 * 16 * 64, activation='relu')(x)
+        x = Dense(8 * 8 * 64, activation='relu')(x)
         x = BatchNormalization()(x)
-        x = Reshape((16, 16, 64))(x)
-        x = Conv2DTranspose(64, (4, 4), strides=(2,2), padding='same', activation='relu')(x)
+        x = Reshape((8, 8, 64))(x)
+        x = Conv2DTranspose(64, (3, 3), strides=(2,2), padding='same', activation='relu')(x)
         x = BatchNormalization()(x)
         x = Conv2DTranspose(32, (4, 4), strides=(2,2), padding='same', activation='relu')(x)
         x = BatchNormalization()(x)
@@ -144,7 +144,7 @@ class InfoGAN():
         Discriminator weights should not be trained with the GAN.
         """
         self.discriminator.trainable = False
-        import pdb;pdb.set_trace()
+        #import pdb;pdb.set_trace()
         gan_output = self.discriminator(self.g_output)
         gan_output_aux = self.auxiliary(self.g_output)
         self.gan = Model(inputs=[self.z_input, self.c_disc_input], outputs=[gan_output, gan_output_aux])
@@ -168,6 +168,13 @@ class InfoGAN():
         """
         z, c_disc = self.sample_latent_distribution()
         return self.generator.predict([z, c_disc], batch_size=self.batch_size)
+
+    def generate_and_save(self, epoch, num):
+        z, c_disc = self.sample_latent_distribution()
+        generated_imgs = self.generator.predict([z, c_disc], batch_size=num)
+        import pdb;pdb.set_trace()
+        image = np.zeros(shape=self.input_shape)
+        return image
 
     def discriminate(self, x_batch):
         """
